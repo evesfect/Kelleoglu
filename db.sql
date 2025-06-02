@@ -1,4 +1,4 @@
-"/c/Program Files/PostgreSQL/16/bin/psql.exe" -U postgres
+"/c/Program Files/PostgreSQL/17/bin/psql.exe" -U postgres
 \c mysite
 
 CREATE TABLE public.sales_listings (
@@ -21,13 +21,33 @@ INSERT INTO public.sales_listings (
   mileage,
   fuel_type
 ) VALUES (
-  'Toyota Corolla',
-  2018,
-  'Well-maintained, single owner, accident-free.',
+  'Toyota Hilux',
+  204,
+  'Good.',
   15000.00,
   45000,
+  'Diesel'
+);
+
+INSERT INTO public.sales_listings (
+  title,
+  model_year,
+  description,
+  price,
+  mileage,
+  fuel_type
+) VALUES (
+  'Toyota Corolla',
+  2018,
+  'Good Condition.',
+  15000.00,
+  90000,
   'Gasoline'
 );
+
+UPDATE public.sales_listings 
+SET image_url = 'https://i.ibb.co/KcHQcGnK/hilux.jpg'
+WHERE title = 'Toyota Hilux';
 
 SELECT * FROM public.sales_listings;
 
