@@ -8,8 +8,14 @@ import ProductCard from './components/ProductCard';
 // Main Homepage Component
 export default function HomePage() {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filters, setFilters] = useState({
+    priceRange: [0, 100000],
+    yearRange: [2000, 2025]
+  });
 
   // Fetch products from database
   useEffect(() => {
@@ -31,6 +37,7 @@ export default function HomePage() {
 
         const data = await response.json();
         setProducts(data);
+        setFilteredProducts(data);
         setError(null);
       } catch (err) {
         setError('Failed to fetch products');
@@ -42,6 +49,40 @@ export default function HomePage() {
 
     fetchProducts();
   }, []);
+
+  // Filter products based on search term and filters
+  useEffect(() => {
+    let filtered = products;
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(product =>
+        product.title.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+
+    // Apply price filter
+    filtered = filtered.filter(product =>
+      product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
+    );
+
+    // Apply year filter
+    filtered = filtered.filter(product =>
+      product.model_year >= filters.yearRange[0] && product.model_year <= filters.yearRange[1]
+    );
+
+    setFilteredProducts(filtered);
+  }, [products, searchTerm, filters]);
+
+  // Handle search changes
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+  };
 
   if (loading) {
     return (
@@ -76,13 +117,18 @@ export default function HomePage() {
         <div className="flex items-center mt-4 mb-6">
           <BookAppointmentButton />
           <div className="flex-1 flex justify-center">
-            <SearchBar message="Search a model" />
+            <SearchBar 
+              message="Search a model" 
+              onSearch={handleSearch}
+              onFilterChange={handleFilterChange}
+              products={products}
+            />
           </div>
         </div>
        
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {filteredProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -91,9 +137,11 @@ export default function HomePage() {
         </div>
 
         {/* Show message if no products */}
-        {products.length === 0 && !loading && (
+        {filteredProducts.length === 0 && !loading && (
           <div className="text-center mt-12">
-            <p className="text-gray-600 text-lg">No products found</p>
+            <p className="text-gray-600 text-lg">
+              {products.length === 0 ? "No products found" : "No products match your search criteria"}
+            </p>
           </div>
         )}
       </div>

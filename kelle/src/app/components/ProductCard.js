@@ -4,7 +4,7 @@ export default function ProductCard({ product }) {
   const [imageError, setImageError] = useState(false);
   
   return (
-    <div className="bg-white rounded-[10px] shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer">
+    <div className="bg-white rounded-[10px] shadow-lg overflow-hidden hover:shadow-xl hover:scale-105 transition-all duration-300 cursor-pointer">
       {/* Image Area */}
       <div className="h-42 bg-gray-200 overflow-hidden">
         {product.image_url && !imageError ? (
