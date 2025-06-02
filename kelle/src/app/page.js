@@ -4,6 +4,7 @@ import Topbar from './components/Topbar';
 import BookAppointmentButton from './components/BookButton';
 import SearchBar from './components/SearchBar';
 import ProductCard from './components/ProductCard';
+import Toast from './components/Toast';
 
 // Main Homepage Component
 export default function HomePage() {
@@ -16,6 +17,20 @@ export default function HomePage() {
     priceRange: [0, 100000],
     yearRange: [2000, 2025]
   });
+
+  // Toast state
+  const [showToast, setShowToast] = useState(false);
+  const toastMessage = "info.kelleauto@gmail.com\n +47 (463) 74-775";
+
+  // Function to show toast
+  const triggerToast = () => {
+    setShowToast(true);
+  };
+
+  // Function to close toast
+  const closeToast = () => {
+    setShowToast(false);
+  };
 
   // Fetch products from database
   useEffect(() => {
@@ -125,7 +140,7 @@ export default function HomePage() {
             />
           </div>
         </div>
-       
+
         {/* Product Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredProducts.map((product) => (
@@ -144,6 +159,25 @@ export default function HomePage() {
             </p>
           </div>
         )}
+      </div>
+
+      {/* Toast Component */}
+      <Toast
+        message={toastMessage}
+        isVisible={showToast}
+        onClose={closeToast}
+        duration={10000}
+      />
+      {/* Fixed bottom text */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-0">
+        <div className="text-center">
+          <span 
+            className="text-gray-600 text-sm cursor-pointer hover:text-orange-600 transition-colors"
+            onClick={triggerToast}
+          >
+            show contact info
+          </span>
+        </div>
       </div>
     </div>
   );
