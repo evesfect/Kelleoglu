@@ -1,13 +1,48 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 
 // Reusable Topbar Component
 export default function Topbar() {
   const [activeTab, setActiveTab] = useState('Sales');
+  const pathname = usePathname();
+  const router = useRouter();
   const tabs = ['Sales', 'Cleaning', 'Service'];
 
+  // Set active tab based on current route
+  useEffect(() => {
+    if (pathname === '/' || pathname.startsWith('/sales_listing/')) {
+      setActiveTab('Sales');
+    } else if (pathname.startsWith('/cleaning')) {
+      setActiveTab('Cleaning');
+    } else if (pathname.startsWith('/service')) {
+      setActiveTab('Service');
+    }
+  }, [pathname]);
+
+  const handleTabClick = (tab) => {
+    if (tab === activeTab) return; // Don't navigate if it's the same tab
+    
+    setActiveTab(tab);
+    
+    // Navigate to appropriate page
+    switch (tab) {
+      case 'Sales':
+        router.push('/');
+        break;
+      case 'Cleaning':
+        router.push('/cleaning');
+        break;
+      case 'Service':
+        router.push('/service');
+        break;
+      default:
+        break;
+    }
+  };
+
   const handleLogoClick = () => {
-    window.location.href = '/';
+    router.push('/');
   };
 
   return (
@@ -22,7 +57,7 @@ export default function Topbar() {
         {tabs.map((tab) => (
           <button
             key={tab}
-            onClick={() => setActiveTab(tab)}
+            onClick={() => handleTabClick(tab)}
             className={`px-4 py-1 rounded-lg text-gray-900 transition-colors ${
               activeTab === tab ? 'bg-white shadow-sm border border-gray-200' : 'hover:bg-gray-50'
             }`}

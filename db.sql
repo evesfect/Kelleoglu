@@ -49,5 +49,13 @@ UPDATE public.sales_listings
 SET image_url = 'https://i.ibb.co/KcHQcGnK/hilux.jpg'
 WHERE title = 'Toyota Hilux';
 
+CREATE TABLE public.bookings (
+  id SERIAL PRIMARY KEY,
+  type VARCHAR(50) NOT NULL,
+  details TEXT,
+  appointment_time TIMESTAMP,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
 SELECT * FROM public.sales_listings;
 
