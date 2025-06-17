@@ -13,16 +13,16 @@ const pool = new Pool({
 
 export async function POST(request) {
   try {
-    const { type, details, appointment_time } = await request.json();
+    const { type, details, contact_name, contact_phonenumber, appointment_time } = await request.json();
     
     // Insert the booking into the database
     const query = `
-      INSERT INTO public.bookings (type, details, appointment_time)
-      VALUES ($1, $2, $3)
-      RETURNING id, type, details, appointment_time, created_at
+      INSERT INTO public.bookings (type, details, contact_name, contact_phonenumber, appointment_time)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING id, type, details, contact_name, contact_phonenumber, appointment_time, created_at
     `;
     
-    const result = await pool.query(query, [type, details, appointment_time]);
+    const result = await pool.query(query, [type, details, contact_name, contact_phonenumber, appointment_time]);
     
     // Return the created booking
     return Response.json(result.rows[0], { status: 201 });

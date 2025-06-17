@@ -1,4 +1,4 @@
-"/c/Program Files/PostgreSQL/17/bin/psql.exe" -U postgres
+l"/c/Program Files/PostgreSQL/17/bin/psql.exe" -U postgres
 \c mysite
 
 CREATE TABLE public.sales_listings (
@@ -53,6 +53,8 @@ CREATE TABLE public.bookings (
   id SERIAL PRIMARY KEY,
   type VARCHAR(50) NOT NULL,
   details TEXT,
+  contact_name TEXT,
+  contact_phonenumber TEXT,
   appointment_time TIMESTAMP,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,0 +1,1 @@
+I want to add a name and phone number value to the booking button, they should be also stored in the bookings table. There should be two boxes for these values under the time selection in the booking popup. They should be mandatory to fill.

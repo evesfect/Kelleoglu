@@ -11,6 +11,8 @@ export default function BookAppointmentButton({
   const [showTimeModal, setShowTimeModal] = useState(false);
   const [selectedDate, setSelectedDate] = useState('');
   const [selectedTime, setSelectedTime] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
   const [occupiedSlots, setOccupiedSlots] = useState([]);
   const [checkingSlots, setCheckingSlots] = useState(false);
 
@@ -84,6 +86,11 @@ export default function BookAppointmentButton({
       return;
     }
 
+    if (!contactName.trim() || !contactPhone.trim()) {
+      alert('Please fill in both contact name and phone number');
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -98,6 +105,8 @@ export default function BookAppointmentButton({
         body: JSON.stringify({
           type: type,
           details: details,
+          contact_name: contactName.trim(),
+          contact_phonenumber: contactPhone.trim(),
           appointment_time: appointmentTimeString // Send as string, not ISO
         }),
       });
@@ -107,6 +116,8 @@ export default function BookAppointmentButton({
         setShowTimeModal(false);
         setSelectedDate('');
         setSelectedTime('');
+        setContactName('');
+        setContactPhone('');
         setOccupiedSlots([]);
       } else {
         alert('Failed to create booking. Please try again.');
@@ -123,6 +134,8 @@ export default function BookAppointmentButton({
     setShowTimeModal(false);
     setSelectedDate('');
     setSelectedTime('');
+    setContactName('');
+    setContactPhone('');
     setOccupiedSlots([]);
   };
 
@@ -135,6 +148,9 @@ export default function BookAppointmentButton({
       setSelectedTime(timeSlot.value);
     }
   };
+
+  // Check if all required fields are filled
+  const isFormValid = selectedDate && selectedTime && contactName.trim() && contactPhone.trim();
 
   return (
     <>
@@ -157,7 +173,7 @@ export default function BookAppointmentButton({
         >
           <div className="bg-white rounded-lg p-6 w-96 max-w-90vw shadow-xl border border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Appointment Time</h3>
-            
+
             {/* Date Selection */}
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -205,6 +221,34 @@ export default function BookAppointmentButton({
               </div>
             </div>
 
+            {/* Contact Information */}
+            <div className="mb-4 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Contact Name:
+                </label>
+                <input
+                  type="text"
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  placeholder="This value is necessary"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:border-transparent placeholder-gray-400"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Phone Number:
+                </label>
+                <input
+                  type="tel"
+                  value={contactPhone}
+                  onChange={(e) => setContactPhone(e.target.value)}
+                  placeholder="This value is necessary"
+                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-300 focus:border-transparent placeholder-gray-400"
+                />
+              </div>
+            </div>
+
             {/* Action Buttons */}
             <div className="flex gap-3 justify-end">
               <button
@@ -215,9 +259,9 @@ export default function BookAppointmentButton({
               </button>
               <button
                 onClick={handleBooking}
-                disabled={isLoading || !selectedDate || !selectedTime || checkingSlots}
+                disabled={isLoading || !isFormValid || checkingSlots}
                 className={`px-4 py-2 bg-orange-400 text-white rounded-lg hover:bg-orange-500 transition-colors ${
-                  (isLoading || !selectedDate || !selectedTime || checkingSlots) ? 'opacity-50 cursor-not-allowed' : ''
+                  (isLoading || !isFormValid || checkingSlots) ? 'opacity-50 cursor-not-allowed' : ''
                 }`}
               >
                 {isLoading ? 'Booking...' : 'Confirm Booking'}
