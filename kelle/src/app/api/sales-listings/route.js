@@ -43,3 +43,28 @@ export async function GET(request) {
     );
   }
 }
+
+export async function POST(request) {
+  try {
+    const { title, model_year, description, price, mileage, fuel_type, image_url } = await request.json();
+    
+    // Insert new sales listing
+    const query = `
+      INSERT INTO public.sales_listings (title, model_year, description, price, mileage, fuel_type, image_url)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id, title, model_year, description, price, mileage, fuel_type, image_url, created_at, updated_at
+    `;
+    
+    const result = await pool.query(query, [title, model_year, description, price, mileage, fuel_type, image_url]);
+    
+    // Return the created listing
+    return Response.json(result.rows[0], { status: 201 });
+    
+  } catch (error) {
+    console.error('Database error:', error);
+    return Response.json(
+      { error: 'Failed to create sales listing' }, 
+      { status: 500 }
+    );
+  }
+}

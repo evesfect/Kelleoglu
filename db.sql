@@ -1,4 +1,4 @@
-l"/c/Program Files/PostgreSQL/17/bin/psql.exe" -U postgres
+"/c/Program Files/PostgreSQL/17/bin/psql.exe" -U postgres
 \c mysite
 
 CREATE TABLE public.sales_listings (
