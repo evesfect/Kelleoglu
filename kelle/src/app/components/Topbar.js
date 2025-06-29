@@ -51,7 +51,7 @@ export default function Topbar() {
         className="text-gray-900 text-xl font-medium cursor-pointer hover:text-orange-600 transition-colors"
         onClick={handleLogoClick}
       >
-        KelleAuto
+        Anatolia Motors
       </span>
       <div className="flex gap-2">
         {tabs.map((tab) => (

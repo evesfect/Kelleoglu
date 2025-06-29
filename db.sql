@@ -1,6 +1,8 @@
 "/c/Program Files/PostgreSQL/17/bin/psql.exe" -U postgres
 \c mysite
 
+
+
 CREATE TABLE public.sales_listings (
   id SERIAL PRIMARY KEY,
   title VARCHAR(255) NOT NULL,
@@ -60,4 +62,30 @@ CREATE TABLE public.bookings (
 );
 
 SELECT * FROM public.sales_listings;
+
+CREATE TABLE public.cleaning_offerings (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE public.service_offerings (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(255) NOT NULL,
+  description TEXT,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO public.cleaning_offerings (name, description) VALUES 
+('Exterior Wash', 'Complete exterior cleaning and washing'),
+('Interior Cleaning', 'Deep interior cleaning and vacuuming'),
+('Wax & Polish', 'Professional waxing and polishing service'),
+('Engine Cleaning', 'Engine bay cleaning and degreasing'),
+('Wheel & Tire Cleaning', 'Specialized wheel and tire treatment'),
+('Headlight Restoration', 'Headlight clarity restoration service'),
+('Fabric Protection', 'Interior fabric protection treatment'),
+('Ceramic Coating', 'Long-lasting ceramic coating application');
 
