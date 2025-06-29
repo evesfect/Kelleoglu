@@ -239,13 +239,17 @@ export default function AdminPage() {
 
   const handleSave = async () => {
     try {
+      // Create a copy of formData to work with
+      let dataToSave = { ...formData };
+      
       // Ensure at least one image is marked as main if images exist
-      if (formData.images && formData.images.length > 0) {
-        const hasMainImage = formData.images.some(img => img.is_main);
+      if (dataToSave.images && dataToSave.images.length > 0) {
+        const hasMainImage = dataToSave.images.some(img => img.is_main);
         if (!hasMainImage) {
-          const updatedImages = [...formData.images];
-          updatedImages[0].is_main = true;
-          setFormData({...formData, images: updatedImages});
+          dataToSave.images = dataToSave.images.map((img, index) => ({
+            ...img,
+            is_main: index === 0
+          }));
         }
       }
 
@@ -260,24 +264,32 @@ export default function AdminPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...formData,
-          model_year: parseInt(formData.model_year),
-          price: parseFloat(formData.price),
-          mileage: parseInt(formData.mileage)
-        }),
+        body: JSON.stringify(dataToSave),
       });
 
-      if (response.ok) {
-        setShowEditModal(false);
-        fetchData(); // Refresh the data
-      } else {
-        const error = await response.json();
-        alert('Error saving listing: ' + error.error);
+      if (!response.ok) {
+        throw new Error('Failed to save listing');
       }
-    } catch (err) {
-      console.error('Error saving listing:', err);
-      alert('Error saving listing');
+
+      // Refresh the sales listings
+      fetchData();
+      setShowEditModal(false);
+      
+      // Reset form
+      setFormData({
+        title: '',
+        model_year: '',
+        description: '',
+        price: '',
+        mileage: '',
+        fuel_type: '',
+        images: []
+      });
+      setEditingListing(null);
+      
+    } catch (error) {
+      console.error('Error saving listing:', error);
+      setError('Failed to save listing');
     }
   };
 
@@ -833,7 +845,7 @@ export default function AdminPage() {
                             // When selecting a main image, unmark all others and mark this one
                             const newImages = formData.images.map((img, i) => ({
                               ...img,
-                              is_main: i === index
+                              is_main: i === index // Only this index should be true, all others false
                             }));
                             setFormData({...formData, images: newImages});
                           }}

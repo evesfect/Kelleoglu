@@ -9,11 +9,17 @@ export default function ProductCard({ product }) {
     router.push(`/sales_listing/${product.id}`);
   };
 
-  // Get the main image or first image
+  // 
+  // the main image or first image
   const getMainImage = () => {
     if (!product.images || product.images.length === 0) {
       return null;
     }
+    
+    // Debug logging
+    console.log('Product:', product.title);
+    console.log('Images:', product.images);
+    console.log('Images with is_main true:', product.images.filter(img => img.is_main));
     
     // Find the main image
     const mainImage = product.images.find(img => img.is_main);

@@ -1,9 +1,21 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ImageCarousel({ images, altText = "Product image" }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [imageError, setImageError] = useState({});
+
+  // Set initial index to the main image
+  useEffect(() => {
+    if (images && images.length > 0) {
+      const mainImageIndex = images.findIndex(img => img.is_main);
+      if (mainImageIndex !== -1) {
+        setCurrentIndex(mainImageIndex);
+      } else {
+        setCurrentIndex(0); // fallback to first image
+      }
+    }
+  }, [images]);
 
   if (!images || images.length === 0) {
     return (

@@ -74,16 +74,31 @@ export async function POST(request) {
       const newListing = listingResult.rows[0];
       
       // Insert images if provided
-      if (images && images.length > 0) {
-        for (let i = 0; i < images.length; i++) {
-          const image = images[i];
-          const imageQuery = `
-            INSERT INTO public.sales_listing_images (sales_listing_id, image_url, is_main, sort_order)
-            VALUES ($1, $2, $3, $4)
-          `;
-          await client.query(imageQuery, [newListing.id, image.image_url, i === 0, i]);
+        if (images && images.length > 0) {
+          // Ensure only one image is marked as main
+          let hasMain = false;
+          const processedImages = images.map((image, i) => {
+            if (image.is_main === true && !hasMain) {
+              hasMain = true;
+              return { ...image, is_main: true };
+            }
+            return { ...image, is_main: false };
+          });
+          
+          // If no image was marked as main, make the first one main
+          if (!hasMain && processedImages.length > 0) {
+            processedImages[0].is_main = true;
+          }
+          
+          for (let i = 0; i < processedImages.length; i++) {
+            const image = processedImages[i];
+            const imageQuery = `
+              INSERT INTO public.sales_listing_images (sales_listing_id, image_url, is_main, sort_order)
+              VALUES ($1, $2, $3, $4)
+            `;
+            await client.query(imageQuery, [newListing.id, image.image_url, image.is_main, i]);
+          }
         }
-      }
       
       await client.query('COMMIT');
       

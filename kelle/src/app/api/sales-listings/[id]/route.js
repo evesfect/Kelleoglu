@@ -95,14 +95,29 @@ export async function PUT(request, { params }) {
         // Delete existing images
         await client.query('DELETE FROM public.sales_listing_images WHERE sales_listing_id = $1', [id]);
         
+        // Ensure only one image is marked as main
+        let hasMain = false;
+        const processedImages = images.map((image, i) => {
+          if (image.is_main === true && !hasMain) {
+            hasMain = true;
+            return { ...image, is_main: true };
+          }
+          return { ...image, is_main: false };
+        });
+        
+        // If no image was marked as main, make the first one main
+        if (!hasMain && processedImages.length > 0) {
+          processedImages[0].is_main = true;
+        }
+        
         // Insert new images
-        for (let i = 0; i < images.length; i++) {
-          const image = images[i];
+        for (let i = 0; i < processedImages.length; i++) {
+          const image = processedImages[i];
           const imageQuery = `
             INSERT INTO public.sales_listing_images (sales_listing_id, image_url, is_main, sort_order)
             VALUES ($1, $2, $3, $4)
           `;
-          await client.query(imageQuery, [id, image.image_url, image.is_main || i === 0, i]);
+          await client.query(imageQuery, [id, image.image_url, image.is_main, i]);
         }
       }
       
