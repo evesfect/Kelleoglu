@@ -8,6 +8,24 @@ export default function ProductCard({ product }) {
   const handleCardClick = () => {
     router.push(`/sales_listing/${product.id}`);
   };
+
+  // Get the main image or first image
+  const getMainImage = () => {
+    if (!product.images || product.images.length === 0) {
+      return null;
+    }
+    
+    // Find the main image
+    const mainImage = product.images.find(img => img.is_main);
+    if (mainImage) {
+      return mainImage.image_url;
+    }
+    
+    // If no main image, use the first one
+    return product.images[0].image_url;
+  };
+
+  const mainImageUrl = getMainImage();
   
   return (
     <div 
@@ -15,10 +33,10 @@ export default function ProductCard({ product }) {
       onClick={handleCardClick}
     >
       {/* Image Area */}
-      <div className="h-42 bg-gray-200 overflow-hidden">
-        {product.image_url && !imageError ? (
+      <div className="h-42 bg-gray-200 overflow-hidden relative">
+        {mainImageUrl && !imageError ? (
           <img 
-            src={product.image_url}
+            src={mainImageUrl}
             alt={`${product.title} ${product.model_year}`}
             className="w-full h-full object-cover"
             onError={() => setImageError(true)}
@@ -26,6 +44,13 @@ export default function ProductCard({ product }) {
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <p className="text-gray-500 text-sm text-center">No image available</p>
+          </div>
+        )}
+        
+        {/* Image count indicator */}
+        {product.images && product.images.length > 1 && (
+          <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+            {product.images.length} photos
           </div>
         )}
       </div>

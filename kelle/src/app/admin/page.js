@@ -21,7 +21,7 @@ export default function AdminPage() {
     price: '',
     mileage: '',
     fuel_type: '',
-    image_url: ''
+    images: [] // Changed from image_url to images array
   });
 
   // Bookings State
@@ -218,7 +218,7 @@ export default function AdminPage() {
       price: listing.price || '',
       mileage: listing.mileage || '',
       fuel_type: listing.fuel_type || '',
-      image_url: listing.image_url || ''
+      images: listing.images || []
     });
     setShowEditModal(true);
   };
@@ -232,13 +232,23 @@ export default function AdminPage() {
       price: '',
       mileage: '',
       fuel_type: '',
-      image_url: ''
+      images: []
     });
     setShowEditModal(true);
   };
 
   const handleSave = async () => {
     try {
+      // Ensure at least one image is marked as main if images exist
+      if (formData.images && formData.images.length > 0) {
+        const hasMainImage = formData.images.some(img => img.is_main);
+        if (!hasMainImage) {
+          const updatedImages = [...formData.images];
+          updatedImages[0].is_main = true;
+          setFormData({...formData, images: updatedImages});
+        }
+      }
+
       const url = editingListing 
         ? `/api/sales-listings/${editingListing.id}`
         : '/api/sales-listings';
@@ -728,103 +738,159 @@ export default function AdminPage() {
      </div>
 
      {/* Sales Listings Edit/Add Modal */}
-     {showEditModal && (
-       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-         <div className="bg-gray-800 p-6 rounded-lg w-96 max-h-[90vh] overflow-y-auto">
-           <h3 className="text-xl font-semibold mb-4">
-             {editingListing ? 'Edit Listing' : 'Add New Listing'}
-           </h3>
-           
-           <div className="space-y-4">
-             <div>
-               <label className="block text-sm font-medium mb-1">Title</label>
-               <input
-                 type="text"
-                 value={formData.title}
-                 onChange={(e) => setFormData({...formData, title: e.target.value})}
-                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-               />
-             </div>
-             
-             <div>
-               <label className="block text-sm font-medium mb-1">Model Year</label>
-               <input
-                 type="number"
-                 value={formData.model_year}
-                 onChange={(e) => setFormData({...formData, model_year: e.target.value})}
-                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-               />
-             </div>
-             
-             <div>
-               <label className="block text-sm font-medium mb-1">Price (€)</label>
-               <input
-                 type="number"
-                 step="0.01"
-                 value={formData.price}
-                 onChange={(e) => setFormData({...formData, price: e.target.value})}
-                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-               />
-             </div>
-             
-             <div>
-               <label className="block text-sm font-medium mb-1">Mileage (km)</label>
-               <input
-                 type="number"
-                 value={formData.mileage}
-                 onChange={(e) => setFormData({...formData, mileage: e.target.value})}
-                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-               />
-             </div>
-             
-             <div>
-               <label className="block text-sm font-medium mb-1">Fuel Type</label>
-               <input
-                 type="text"
-                 value={formData.fuel_type}
-                 onChange={(e) => setFormData({...formData, fuel_type: e.target.value})}
-                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-               />
-             </div>
-             
-             <div>
-               <label className="block text-sm font-medium mb-1">Image URL</label>
-               <input
-                 type="url"
-                 value={formData.image_url}
-                 onChange={(e) => setFormData({...formData, image_url: e.target.value})}
-                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-               />
-             </div>
-             
-             <div>
-               <label className="block text-sm font-medium mb-1">Description</label>
-               <textarea
-                 value={formData.description}
-                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                 rows={3}
-                 className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
-               />
-             </div>
-           </div>
-           
-           <div className="flex gap-2 mt-6">
-             <button
-               onClick={handleSave}
-               className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
-             >
-               Save
-             </button>
-             <button
-               onClick={() => setShowEditModal(false)}
-               className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-             >
-               Cancel
-             </button>
-           </div>
-         </div>
-       </div>
-     )}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-6 rounded-lg w-96 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-semibold mb-4">
+              {editingListing ? 'Edit Listing' : 'Add New Listing'}
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Title</label>
+                <input
+                  type="text"
+                  value={formData.title}
+                  onChange={(e) => setFormData({...formData, title: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Model Year</label>
+                <input
+                  type="number"
+                  value={formData.model_year}
+                  onChange={(e) => setFormData({...formData, model_year: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <textarea
+                  value={formData.description}
+                  onChange={(e) => setFormData({...formData, description: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                  rows="3"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Price (€)</label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formData.price}
+                  onChange={(e) => setFormData({...formData, price: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Mileage (km)</label>
+                <input
+                  type="number"
+                  value={formData.mileage}
+                  onChange={(e) => setFormData({...formData, mileage: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Fuel Type</label>
+                <input
+                  type="text"
+                  value={formData.fuel_type}
+                  onChange={(e) => setFormData({...formData, fuel_type: e.target.value})}
+                  className="w-full px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                />
+              </div>
+              
+              {/* Images Section */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Images</label>
+                <div className="space-y-2">
+                  {formData.images && formData.images.map((image, index) => (
+                    <div key={index} className="flex gap-2 items-center">
+                      <input
+                        type="url"
+                        value={image.image_url}
+                        onChange={(e) => {
+                          const newImages = [...formData.images];
+                          newImages[index] = { ...newImages[index], image_url: e.target.value };
+                          setFormData({...formData, images: newImages});
+                        }}
+                        placeholder="Image URL"
+                        className="flex-1 px-3 py-2 bg-gray-700 text-white rounded border border-gray-600 focus:border-blue-500 focus:outline-none"
+                      />
+                      <label className="flex items-center text-sm">
+                        <input
+                          type="radio"
+                          name="mainImage"
+                          checked={image.is_main || false}
+                          onChange={() => {
+                            // When selecting a main image, unmark all others and mark this one
+                            const newImages = formData.images.map((img, i) => ({
+                              ...img,
+                              is_main: i === index
+                            }));
+                            setFormData({...formData, images: newImages});
+                          }}
+                          className="mr-1"
+                        />
+                        Main
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newImages = formData.images.filter((_, i) => i !== index);
+                          // If we're removing the main image, make the first remaining image main
+                          if (image.is_main && newImages.length > 0) {
+                            newImages[0].is_main = true;
+                          }
+                          setFormData({...formData, images: newImages});
+                        }}
+                        className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition-colors text-xs"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const newImages = [...(formData.images || []), { 
+                        image_url: '', 
+                        is_main: (formData.images || []).length === 0 // First image is main by default
+                      }];
+                      setFormData({...formData, images: newImages});
+                    }}
+                    className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors text-sm"
+                  >
+                    Add Image
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 mt-6">
+              <button
+                onClick={handleSave}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+              >
+                {editingListing ? 'Update' : 'Create'}
+              </button>
+              <button
+                onClick={() => setShowEditModal(false)}
+                className="flex-1 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
      {/* Cleaning Offerings Modal */}
      {showCleaningModal && (
